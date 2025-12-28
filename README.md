@@ -199,7 +199,42 @@ const shapes = SVGImporter.parseSVGString(`
 `);
 ```
 
-### 7. Exporting
+### 7. Browse LottieFiles Library
+
+```typescript
+import { createLibrary, LottieLibrary } from 'lottie-creator-api';
+
+const library = createLibrary();
+
+// Search for animations
+const results = await library.search({ query: 'loading', page: 1, limit: 20 });
+console.log(`Found ${results.totalResults} animations`);
+
+results.results.forEach(anim => {
+  console.log(`- ${anim.name}: ${anim.lottieUrl}`);
+});
+
+// Get popular animations
+const popular = await library.getPopular({ limit: 10 });
+
+// Get animation details
+const details = await library.getAnimation('animation-id');
+
+// Download animation JSON directly
+const lottieJson = await library.downloadAnimation(results.results[0].lottieUrl);
+
+// Search and download in one call
+const animation = await library.searchAndDownload('success checkmark');
+
+// Browse by category
+const loadingAnims = await library.getByCategory(LottieLibrary.CATEGORIES.LOADING);
+const errorAnims = await library.getByCategory(LottieLibrary.CATEGORIES.ERROR);
+const celebrationAnims = await library.getByCategory(LottieLibrary.CATEGORIES.CELEBRATION);
+```
+
+Available categories: `LOADING`, `SUCCESS`, `ERROR`, `EMPTY`, `ARROWS`, `ICONS`, `CHARACTERS`, `SOCIAL`, `WEATHER`, `TECHNOLOGY`, `BUSINESS`, `EDUCATION`, `HEALTH`, `FOOD`, `ANIMALS`, `NATURE`, `SPORTS`, `MUSIC`, `CELEBRATION`, `LOVE`
+
+### 8. Exporting
 
 ```typescript
 import { Exporter } from 'lottie-creator-api';
@@ -252,6 +287,7 @@ Exporter.download(animation, 'my-animation.json');
 | `ThemeManager` | Extract, create, and apply color themes |
 | `Exporter` | Export to JSON, dotLottie, SVG, data URIs |
 | `SVGImporter` | Convert SVG paths and shapes to Lottie format |
+| `LottieLibrary` | Search and browse LottieFiles animation library |
 
 ### Quick Helpers
 

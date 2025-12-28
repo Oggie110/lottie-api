@@ -30,6 +30,8 @@ src/
 │   └── ThemeManager.ts       # Color theme management
 ├── import/
 │   └── SVGImporter.ts        # SVG to Lottie conversion
+├── library/
+│   └── LottieLibrary.ts      # LottieFiles library browser
 └── export/
     └── Exporter.ts           # Export to JSON, dotLottie, SVG
 ```

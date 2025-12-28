@@ -32,6 +32,16 @@ export type { DotLottieManifest, DotLottieOptions } from './export/Exporter';
 export { SVGImporter } from './import/SVGImporter';
 export type { SVGImportOptions, ParsedSVGShape } from './import/SVGImporter';
 
+// Library Browser
+export { LottieLibrary, createLibrary } from './library/LottieLibrary';
+export type {
+  LottieSearchResult,
+  LottieAnimationData,
+  SearchOptions,
+  PopularOptions,
+  SearchResponse,
+} from './library/LottieLibrary';
+
 // ============================================================================
 // Convenience Factory Functions
 // ============================================================================
@@ -44,6 +54,7 @@ import { PromptToVector } from './ai/PromptToVector';
 import { ThemeManager } from './theme/ThemeManager';
 import { Exporter } from './export/Exporter';
 import { SVGImporter } from './import/SVGImporter';
+import { LottieLibrary } from './library/LottieLibrary';
 
 /**
  * Create a new animation
@@ -301,6 +312,13 @@ export function quickCheckmark(options?: {
 // Default Export
 // ============================================================================
 
+/**
+ * Create a library browser for searching LottieFiles
+ */
+export function createLottieLibrary(): LottieLibrary {
+  return new LottieLibrary();
+}
+
 export default {
   // Factories
   createAnimation,
@@ -309,6 +327,7 @@ export default {
   createMotionCopilot,
   createVectorGenerator,
   createThemeManager,
+  createLottieLibrary,
 
   // Quick helpers
   quickShape,
@@ -324,4 +343,5 @@ export default {
   ThemeManager,
   Exporter,
   SVGImporter,
+  LottieLibrary,
 };

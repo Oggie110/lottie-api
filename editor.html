@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Lottie Creator - Editor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f0f1a;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: #1a1a2e;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #2a2a4a;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+      background: linear-gradient(135deg, #00f0ff, #ff00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Main Layout */
+    .container {
+      display: flex;
+      height: calc(100vh - 61px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 320px;
+      background: #1a1a2e;
+      border-right: 1px solid #2a2a4a;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #2a2a4a;
+    }
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      color: #888;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .tab:hover { color: #fff; }
+    .tab.active {
+      color: #00f0ff;
+      border-bottom: 2px solid #00f0ff;
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+    }
+    .tab-content.active { display: block; }
+
+    /* Search */
+    .search-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #3a3a5a;
+      border-radius: 8px;
+      background: #0f0f1a;
+      color: #fff;
+      font-size: 14px;
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: #00f0ff;
+    }
+    .search-box button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      background: #00f0ff;
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .search-box button:hover { background: #00d4e0; }
+
+    /* Categories */
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 15px;
+    }
+    .category-btn {
+      padding: 6px 12px;
+      border: 1px solid #3a3a5a;
+      border-radius: 20px;
+      background: transparent;
+      color: #aaa;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .category-btn:hover {
+      border-color: #00f0ff;
+      color: #00f0ff;
+    }
+
+    /* Results Grid */
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .result-item {
+      background: #2a2a4a;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    .result-item:hover {
+      border-color: #00f0ff;
+      transform: translateY(-2px);
+    }
+    .result-item.selected {
+      border-color: #00f0ff;
+      background: #3a3a5a;
+    }
+    .result-item .preview {
+      width: 100%;
+      aspect-ratio: 1;
+      background: #1a1a2e;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    .result-item .name {
+      font-size: 11px;
+      color: #ccc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Create Panel */
+    .create-section {
+      margin-bottom: 20px;
+    }
+    .create-section h3 {
+      font-size: 13px;
+      color: #888;
+      margin: 0 0 10px 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .shape-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .shape-btn {
+      aspect-ratio: 1;
+      border: 2px solid #3a3a5a;
+      border-radius: 8px;
+      background: #2a2a4a;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .shape-btn:hover {
+      border-color: #00f0ff;
+    }
+    .shape-btn.selected {
+      border-color: #00f0ff;
+      background: #3a3a5a;
+    }
+    .shape-btn svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    /* Color Picker */
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .color-row label {
+      font-size: 13px;
+      color: #888;
+      width: 60px;
+    }
+    .color-row input[type="color"] {
+      width: 50px;
+      height: 35px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .color-row input[type="text"] {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #3a3a5a;
+      border-radius: 6px;
+      background: #0f0f1a;
+      color: #fff;
+      font-size: 13px;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Preview Area */
+    .preview-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0a0a15;
+      position: relative;
+    }
+    .preview-container {
+      width: 400px;
+      height: 400px;
+      background: #1a1a2e;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    #preview {
+      width: 300px;
+      height: 300px;
+    }
+    .preview-placeholder {
+      color: #555;
+      text-align: center;
+    }
+    .preview-placeholder svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 15px;
+      opacity: 0.3;
+    }
+
+    /* Animation Panel */
+    .animation-panel {
+      background: #1a1a2e;
+      border-top: 1px solid #2a2a4a;
+      padding: 20px 30px;
+    }
+    .animation-panel h3 {
+      margin: 0 0 15px 0;
+      font-size: 14px;
+      color: #888;
+    }
+    .animation-options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .anim-btn {
+      padding: 10px 20px;
+      border: 2px solid #3a3a5a;
+      border-radius: 8px;
+      background: transparent;
+      color: #ccc;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .anim-btn:hover {
+      border-color: #00f0ff;
+      color: #00f0ff;
+    }
+    .anim-btn.selected {
+      border-color: #00f0ff;
+      background: rgba(0, 240, 255, 0.1);
+      color: #00f0ff;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #2a2a4a;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #00f0ff, #00a0ff);
+      color: #000;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 240, 255, 0.3);
+    }
+    .btn-secondary {
+      background: #2a2a4a;
+      color: #fff;
+    }
+    .btn-secondary:hover {
+      background: #3a3a5a;
+    }
+
+    /* Range slider */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .slider-row label {
+      font-size: 13px;
+      color: #888;
+      width: 80px;
+    }
+    .slider-row input[type="range"] {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: #3a3a5a;
+      -webkit-appearance: none;
+    }
+    .slider-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #00f0ff;
+      cursor: pointer;
+    }
+    .slider-row span {
+      width: 50px;
+      text-align: right;
+      font-size: 13px;
+      color: #ccc;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #3a3a5a;
+      border-top-color: #00f0ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Status message */
+    .status {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background: #2a2a4a;
+      border-radius: 8px;
+      font-size: 13px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s;
+    }
+    .status.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .status.success { background: #1a4a3a; color: #4ade80; }
+    .status.error { background: #4a1a2a; color: #f87171; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Lottie Creator</h1>
+    <div>
+      <button class="btn btn-secondary" onclick="exportJSON()">Export JSON</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('library')">Library</button>
+        <button class="tab" onclick="switchTab('create')">Create</button>
+      </div>
+
+      <!-- Library Tab -->
+      <div id="library-tab" class="tab-content active">
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="Search animations..." onkeypress="if(event.key==='Enter')searchAnimations()">
+          <button onclick="searchAnimations()">Search</button>
+        </div>
+
+        <div class="categories">
+          <button class="category-btn" onclick="searchCategory('loading')">Loading</button>
+          <button class="category-btn" onclick="searchCategory('success')">Success</button>
+          <button class="category-btn" onclick="searchCategory('error')">Error</button>
+          <button class="category-btn" onclick="searchCategory('arrow')">Arrows</button>
+          <button class="category-btn" onclick="searchCategory('icon')">Icons</button>
+          <button class="category-btn" onclick="searchCategory('heart')">Hearts</button>
+          <button class="category-btn" onclick="searchCategory('star')">Stars</button>
+          <button class="category-btn" onclick="searchCategory('check')">Checkmarks</button>
+        </div>
+
+        <div id="search-results" class="results-grid">
+          <div class="loading" style="grid-column: 1/-1; display: none;">Searching...</div>
+        </div>
+      </div>
+
+      <!-- Create Tab -->
+      <div id="create-tab" class="tab-content">
+        <div class="create-section">
+          <h3>Choose Shape</h3>
+          <div class="shape-grid">
+            <button class="shape-btn" data-shape="circle" onclick="selectShape('circle')">
+              <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#00f0ff"/></svg>
+            </button>
+            <button class="shape-btn" data-shape="square" onclick="selectShape('square')">
+              <svg viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" rx="8" fill="#ff6b6b"/></svg>
+            </button>
+            <button class="shape-btn" data-shape="star" onclick="selectShape('star')">
+              <svg viewBox="0 0 100 100"><polygon points="50,10 61,40 95,40 68,60 79,90 50,72 21,90 32,60 5,40 39,40" fill="#ffd700"/></svg>
+            </button>
+            <button class="shape-btn" data-shape="triangle" onclick="selectShape('triangle')">
+              <svg viewBox="0 0 100 100"><polygon points="50,15 90,85 10,85" fill="#4ade80"/></svg>
+            </button>
+            <button class="shape-btn" data-shape="heart" onclick="selectShape('heart')">
+              <svg viewBox="0 0 100 100"><path d="M50 88 C20 60 5 40 5 25 C5 10 20 0 35 0 C45 0 50 8 50 8 C50 8 55 0 65 0 C80 0 95 10 95 25 C95 40 80 60 50 88 Z" fill="#f472b6"/></svg>
+            </button>
+            <button class="shape-btn" data-shape="hexagon" onclick="selectShape('hexagon')">
+              <svg viewBox="0 0 100 100"><polygon points="50,5 90,27 90,73 50,95 10,73 10,27" fill="#a78bfa"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="create-section">
+          <h3>Color</h3>
+          <div class="color-row">
+            <label>Fill</label>
+            <input type="color" id="fill-color" value="#00f0ff" onchange="updateColor()">
+            <input type="text" id="fill-hex" value="#00f0ff" onchange="updateColorFromHex()">
+          </div>
+        </div>
+
+        <div class="create-section">
+          <h3>Size</h3>
+          <div class="slider-row">
+            <label>Size</label>
+            <input type="range" id="shape-size" min="50" max="200" value="100" oninput="updateSize()">
+            <span id="size-value">100px</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="preview-area">
+        <div class="preview-container">
+          <div id="preview">
+            <div class="preview-placeholder">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              <p>Select from library or create a shape</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Animation Panel -->
+      <div class="animation-panel">
+        <h3>Animation</h3>
+        <div class="animation-options">
+          <button class="anim-btn" data-anim="none" onclick="selectAnimation('none')">None</button>
+          <button class="anim-btn selected" data-anim="pulse" onclick="selectAnimation('pulse')">Pulse</button>
+          <button class="anim-btn" data-anim="spin" onclick="selectAnimation('spin')">Spin</button>
+          <button class="anim-btn" data-anim="bounce" onclick="selectAnimation('bounce')">Bounce</button>
+          <button class="anim-btn" data-anim="fadeIn" onclick="selectAnimation('fadeIn')">Fade In</button>
+          <button class="anim-btn" data-anim="shake" onclick="selectAnimation('shake')">Shake</button>
+          <button class="anim-btn" data-anim="float" onclick="selectAnimation('float')">Float</button>
+        </div>
+
+        <div class="slider-row">
+          <label>Duration</label>
+          <input type="range" id="duration" min="0.5" max="5" step="0.1" value="2" oninput="updateDuration()">
+          <span id="duration-value">2.0s</span>
+        </div>
+
+        <div class="slider-row">
+          <label>Speed</label>
+          <input type="range" id="speed" min="0.25" max="3" step="0.25" value="1" oninput="updateSpeed()">
+          <span id="speed-value">1.0x</span>
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-primary" onclick="applyAnimation()">Apply Animation</button>
+          <button class="btn btn-secondary" onclick="resetPreview()">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="status" class="status"></div>
+
+  <script>
+    // State
+    let currentAnimation = null;
+    let currentLottie = null;
+    let selectedShape = null;
+    let selectedAnim = 'pulse';
+    let selectedLibraryItem = null;
+    let isFromLibrary = false;
+
+    // Tab switching
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.tab:nth-child(${tab === 'library' ? 1 : 2})`).classList.add('active');
+      document.getElementById(`${tab}-tab`).classList.add('active');
+    }
+
+    // Search animations
+    async function searchAnimations() {
+      const query = document.getElementById('search-input').value.trim();
+      if (!query) return;
+
+      const resultsDiv = document.getElementById('search-results');
+      resultsDiv.innerHTML = '<div class="loading" style="grid-column: 1/-1;">Searching...</div>';
+
+      try {
+        const response = await fetch(`https://lottiefiles.com/api/search/get-animations?query=${encodeURIComponent(query)}&page=1&limit=20`);
+        const data = await response.json();
+        displayResults(data);
+      } catch (error) {
+        resultsDiv.innerHTML = '<p style="grid-column: 1/-1; color: #f87171;">Failed to search. Try again.</p>';
+        showStatus('Search failed', 'error');
+      }
+    }
+
+    function searchCategory(category) {
+      document.getElementById('search-input').value = category;
+      searchAnimations();
+    }
+
+    function displayResults(data) {
+      const resultsDiv = document.getElementById('search-results');
+      const items = data.data?.data || data.data?.results || [];
+
+      if (items.length === 0) {
+        resultsDiv.innerHTML = '<p style="grid-column: 1/-1; color: #888;">No results found</p>';
+        return;
+      }
+
+      resultsDiv.innerHTML = items.map((item, index) => {
+        const lottieUrl = item.lottieUrl || item.jsonUrl || '';
+        const imageUrl = item.imageUrl || item.preview?.image || item.thumbnail || '';
+        const name = item.name || item.title || 'Untitled';
+
+        return `
+          <div class="result-item" data-index="${index}" data-url="${lottieUrl}" onclick="selectLibraryItem(this, '${lottieUrl}', '${name.replace(/'/g, "\\'")}')">
+            <div class="preview" id="lib-preview-${index}">
+              ${imageUrl ? `<img src="${imageUrl}" style="width:100%;height:100%;object-fit:contain;border-radius:6px;">` : ''}
+            </div>
+            <div class="name">${name}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Load previews
+      items.forEach((item, index) => {
+        const url = item.lottieUrl || item.jsonUrl;
+        if (url) {
+          const container = document.getElementById(`lib-preview-${index}`);
+          if (container) {
+            container.innerHTML = '';
+            try {
+              lottie.loadAnimation({
+                container,
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: url
+              });
+            } catch (e) {}
+          }
+        }
+      });
+    }
+
+    async function selectLibraryItem(element, url, name) {
+      // Update selection UI
+      document.querySelectorAll('.result-item').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+
+      selectedLibraryItem = { url, name };
+      isFromLibrary = true;
+      selectedShape = null;
+      document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('selected'));
+
+      // Load into preview
+      try {
+        const response = await fetch(url);
+        currentAnimation = await response.json();
+        renderPreview();
+        showStatus(`Loaded: ${name}`, 'success');
+      } catch (error) {
+        showStatus('Failed to load animation', 'error');
+      }
+    }
+
+    // Shape creation
+    function selectShape(shape) {
+      selectedShape = shape;
+      isFromLibrary = false;
+      selectedLibraryItem = null;
+
+      document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelector(`.shape-btn[data-shape="${shape}"]`).classList.add('selected');
+      document.querySelectorAll('.result-item').forEach(el => el.classList.remove('selected'));
+
+      createShapeAnimation();
+    }
+
+    function createShapeAnimation() {
+      if (!selectedShape) return;
+
+      const color = document.getElementById('fill-color').value;
+      const size = parseInt(document.getElementById('shape-size').value);
+      const duration = parseFloat(document.getElementById('duration').value);
+
+      currentAnimation = generateShapeAnimation(selectedShape, color, size, duration, selectedAnim);
+      renderPreview();
+    }
+
+    function generateShapeAnimation(shape, color, size, duration, animType) {
+      const fps = 60;
+      const frames = fps * duration;
+      const canvasSize = size * 3;
+      const center = canvasSize / 2;
+
+      // Convert hex to RGBA
+      const r = parseInt(color.slice(1, 3), 16) / 255;
+      const g = parseInt(color.slice(3, 5), 16) / 255;
+      const b = parseInt(color.slice(5, 7), 16) / 255;
+
+      // Base animation structure
+      const animation = {
+        v: "5.12.1",
+        fr: fps,
+        ip: 0,
+        op: frames,
+        w: canvasSize,
+        h: canvasSize,
+        nm: "Animation",
+        ddd: 0,
+        assets: [],
+        layers: [],
+        markers: []
+      };
+
+      // Create shape
+      let shapeData;
+      switch (shape) {
+        case 'circle':
+          shapeData = { ty: 'el', nm: 'Circle', p: { a: 0, k: [0, 0] }, s: { a: 0, k: [size, size] } };
+          break;
+        case 'square':
+          shapeData = { ty: 'rc', nm: 'Square', p: { a: 0, k: [0, 0] }, s: { a: 0, k: [size, size] }, r: { a: 0, k: 10 } };
+          break;
+        case 'star':
+          shapeData = createStarShape(size / 2);
+          break;
+        case 'triangle':
+          shapeData = createPolygonShape(size / 2, 3);
+          break;
+        case 'heart':
+          shapeData = createHeartShape(size / 2);
+          break;
+        case 'hexagon':
+          shapeData = createPolygonShape(size / 2, 6);
+          break;
+      }
+
+      // Create transform with animation
+      const transform = {
+        a: { a: 0, k: [0, 0, 0] },
+        p: { a: 0, k: [center, center, 0] },
+        s: { a: 0, k: [100, 100, 100] },
+        r: { a: 0, k: 0 },
+        o: { a: 0, k: 100 }
+      };
+
+      // Apply animation to transform
+      applyAnimationType(transform, animType, frames, center);
+
+      // Create layer
+      const layer = {
+        ty: 4,
+        ind: 0,
+        nm: 'Shape',
+        ks: transform,
+        ip: 0,
+        op: frames,
+        st: 0,
+        ddd: 0,
+        shapes: [{
+          ty: 'gr',
+          nm: 'Group',
+          it: [
+            shapeData,
+            { ty: 'fl', nm: 'Fill', o: { a: 0, k: 100 }, c: { a: 0, k: [r, g, b, 1] }, r: 1 },
+            { ty: 'tr', p: { a: 0, k: [0, 0] }, a: { a: 0, k: [0, 0] }, s: { a: 0, k: [100, 100] }, r: { a: 0, k: 0 }, o: { a: 0, k: 100 } }
+          ],
+          np: 2
+        }]
+      };
+
+      animation.layers.push(layer);
+      return animation;
+    }
+
+    function createStarShape(radius) {
+      const points = 5;
+      const innerRadius = radius * 0.4;
+      const vertices = [];
+
+      for (let i = 0; i < points * 2; i++) {
+        const r = i % 2 === 0 ? radius : innerRadius;
+        const angle = (i * Math.PI / points) - Math.PI / 2;
+        vertices.push([Math.cos(angle) * r, Math.sin(angle) * r]);
+      }
+
+      return {
+        ty: 'sh',
+        nm: 'Star',
+        ks: {
+          a: 0,
+          k: {
+            c: true,
+            v: vertices,
+            i: vertices.map(() => [0, 0]),
+            o: vertices.map(() => [0, 0])
+          }
+        }
+      };
+    }
+
+    function createPolygonShape(radius, sides) {
+      const vertices = [];
+      for (let i = 0; i < sides; i++) {
+        const angle = (i * 2 * Math.PI / sides) - Math.PI / 2;
+        vertices.push([Math.cos(angle) * radius, Math.sin(angle) * radius]);
+      }
+
+      return {
+        ty: 'sh',
+        nm: 'Polygon',
+        ks: {
+          a: 0,
+          k: {
+            c: true,
+            v: vertices,
+            i: vertices.map(() => [0, 0]),
+            o: vertices.map(() => [0, 0])
+          }
+        }
+      };
+    }
+
+    function createHeartShape(size) {
+      return {
+        ty: 'sh',
+        nm: 'Heart',
+        ks: {
+          a: 0,
+          k: {
+            c: true,
+            v: [
+              [0, size * 0.8],
+              [-size * 0.9, -size * 0.1],
+              [-size * 0.5, -size],
+              [0, -size * 0.5],
+              [size * 0.5, -size],
+              [size * 0.9, -size * 0.1]
+            ],
+            i: [
+              [-size * 0.5, 0],
+              [0, size * 0.5],
+              [-size * 0.3, 0],
+              [0, -size * 0.3],
+              [size * 0.3, 0],
+              [0, -size * 0.5]
+            ],
+            o: [
+              [size * 0.5, 0],
+              [0, -size * 0.3],
+              [size * 0.3, 0],
+              [0, size * 0.3],
+              [-size * 0.3, 0],
+              [0, size * 0.5]
+            ]
+          }
+        }
+      };
+    }
+
+    function applyAnimationType(transform, animType, frames, center) {
+      const easeInOut = { x: 0.42, y: 0 };
+      const easeOut = { x: 0, y: 0 };
+
+      switch (animType) {
+        case 'pulse':
+          transform.s = {
+            a: 1,
+            k: [
+              { t: 0, s: [100, 100, 100], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+              { t: frames / 2, s: [115, 115, 100], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+              { t: frames, s: [100, 100, 100] }
+            ]
+          };
+          break;
+        case 'spin':
+          transform.r = {
+            a: 1,
+            k: [
+              { t: 0, s: [0], i: { x: 1, y: 1 }, o: { x: 0, y: 0 } },
+              { t: frames, s: [360] }
+            ]
+          };
+          break;
+        case 'bounce':
+          transform.p = {
+            a: 1,
+            k: [
+              { t: 0, s: [center, center, 0], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+              { t: frames * 0.25, s: [center, center - 50, 0], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+              { t: frames * 0.5, s: [center, center, 0], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+              { t: frames * 0.75, s: [center, center - 25, 0], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+              { t: frames, s: [center, center, 0] }
+            ]
+          };
+          break;
+        case 'fadeIn':
+          transform.o = {
+            a: 1,
+            k: [
+              { t: 0, s: [0], i: { x: 0, y: 0 }, o: { x: 0.58, y: 1 } },
+              { t: frames, s: [100] }
+            ]
+          };
+          break;
+        case 'shake':
+          const shakeFrames = [];
+          const shakeAmount = 10;
+          for (let i = 0; i <= 10; i++) {
+            const offset = i % 2 === 0 ? shakeAmount : -shakeAmount;
+            shakeFrames.push({
+              t: (frames / 10) * i,
+              s: [center + (i === 0 || i === 10 ? 0 : offset), center, 0],
+              i: { x: 0.42, y: 0 },
+              o: { x: 0.58, y: 1 }
+            });
+          }
+          transform.p = { a: 1, k: shakeFrames };
+          break;
+        case 'float':
+          transform.p = {
+            a: 1,
+            k: [
+              { t: 0, s: [center, center, 0], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+              { t: frames / 2, s: [center, center - 20, 0], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+              { t: frames, s: [center, center, 0] }
+            ]
+          };
+          break;
+      }
+    }
+
+    // Animation selection
+    function selectAnimation(anim) {
+      selectedAnim = anim;
+      document.querySelectorAll('.anim-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelector(`.anim-btn[data-anim="${anim}"]`).classList.add('selected');
+    }
+
+    // Apply animation
+    function applyAnimation() {
+      if (isFromLibrary && selectedLibraryItem) {
+        // For library items, we'd need to modify the existing animation
+        // For now, just show it with speed changes
+        showStatus('Animation applied!', 'success');
+      } else if (selectedShape) {
+        createShapeAnimation();
+        showStatus('Animation applied!', 'success');
+      } else {
+        showStatus('Select a shape or animation first', 'error');
+      }
+    }
+
+    // Update functions
+    function updateColor() {
+      const color = document.getElementById('fill-color').value;
+      document.getElementById('fill-hex').value = color;
+      if (selectedShape) createShapeAnimation();
+    }
+
+    function updateColorFromHex() {
+      const hex = document.getElementById('fill-hex').value;
+      if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+        document.getElementById('fill-color').value = hex;
+        if (selectedShape) createShapeAnimation();
+      }
+    }
+
+    function updateSize() {
+      const size = document.getElementById('shape-size').value;
+      document.getElementById('size-value').textContent = size + 'px';
+      if (selectedShape) createShapeAnimation();
+    }
+
+    function updateDuration() {
+      const duration = document.getElementById('duration').value;
+      document.getElementById('duration-value').textContent = parseFloat(duration).toFixed(1) + 's';
+      if (selectedShape) createShapeAnimation();
+    }
+
+    function updateSpeed() {
+      const speed = document.getElementById('speed').value;
+      document.getElementById('speed-value').textContent = parseFloat(speed).toFixed(2) + 'x';
+      if (currentLottie) {
+        currentLottie.setSpeed(parseFloat(speed));
+      }
+    }
+
+    // Render preview
+    function renderPreview() {
+      const container = document.getElementById('preview');
+      container.innerHTML = '';
+
+      if (currentAnimation) {
+        currentLottie = lottie.loadAnimation({
+          container,
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          animationData: currentAnimation
+        });
+
+        const speed = parseFloat(document.getElementById('speed').value);
+        currentLottie.setSpeed(speed);
+      }
+    }
+
+    function resetPreview() {
+      currentAnimation = null;
+      selectedShape = null;
+      selectedLibraryItem = null;
+      isFromLibrary = false;
+
+      document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll('.result-item').forEach(el => el.classList.remove('selected'));
+
+      document.getElementById('preview').innerHTML = `
+        <div class="preview-placeholder">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          <p>Select from library or create a shape</p>
+        </div>
+      `;
+
+      showStatus('Preview reset', 'success');
+    }
+
+    // Export
+    function exportJSON() {
+      if (!currentAnimation) {
+        showStatus('Nothing to export', 'error');
+        return;
+      }
+
+      const json = JSON.stringify(currentAnimation, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'animation.json';
+      a.click();
+
+      URL.revokeObjectURL(url);
+      showStatus('Exported animation.json', 'success');
+    }
+
+    // Status messages
+    function showStatus(message, type) {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.className = `status ${type} show`;
+      setTimeout(() => status.classList.remove('show'), 3000);
+    }
+
+    // Initial search
+    searchCategory('loading');
+  </script>
+</body>
+</html>

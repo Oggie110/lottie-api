@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cute Doggie - Lottie Preview</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #00f0ff, #ff00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .preview-container {
+      width: 500px;
+      height: 350px;
+      background: #1a1a2e;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      border: 2px solid #2a2a4a;
+    }
+    #animation {
+      width: 450px;
+      height: 300px;
+    }
+    .info {
+      margin-top: 20px;
+      color: #888;
+      font-size: 14px;
+    }
+    .btn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #00f0ff, #00a0ff);
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cute Doggie</h1>
+  <div class="preview-container">
+    <div id="animation"></div>
+  </div>
+  <p class="info">From LottieFiles Library</p>
+  <a href="editor.html" class="btn">Open Editor</a>
+
+  <script>
+    // Fetch and load animation (using CORS proxy for file:// compatibility)
+    const CORS_PROXY = 'https://corsproxy.io/?';
+    const animationUrl = 'https://assets-v2.lottiefiles.com/a/a7463dc6-1153-11ee-8438-1bd7dc8f62ea/8g8PgZ5Ykz.json';
+    
+    fetch(CORS_PROXY + encodeURIComponent(animationUrl))
+      .then(r => r.json())
+      .then(data => {
+        lottie.loadAnimation({
+          container: document.getElementById('animation'),
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          animationData: data
+        });
+      });
+  </script>
+</body>
+</html>

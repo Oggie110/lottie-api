@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>SVG → Lottie Animation Demo</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  <style>
+    body { font-family: system-ui; background: #1a1a2e; color: white; margin: 0; padding: 40px; }
+    h1 { text-align: center; margin-bottom: 10px; }
+    .subtitle { text-align: center; opacity: 0.7; margin-bottom: 40px; }
+    .container { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; }
+    .panel { background: #2a2a4a; border-radius: 16px; padding: 20px; min-width: 300px; }
+    .panel h3 { margin: 0 0 15px 0; font-size: 14px; opacity: 0.8; text-align: center; }
+    .svg-source { background: #1a1a35; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center; }
+    .svg-source svg { max-width: 180px; height: 180px; }
+    .arrow { text-align: center; font-size: 24px; padding: 10px 0; }
+    .animation { width: 250px; height: 250px; margin: 0 auto; background: #1a1a35; border-radius: 8px; }
+    .code { background: #0f0f1a; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 11px; overflow-x: auto; white-space: pre; color: #88ff88; margin-top: 15px; max-height: 200px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+  <h1>SVG → Lottie Animation</h1>
+  <p class="subtitle">Import SVG, convert to Lottie shapes, then animate with the API</p>
+
+  <div class="container">
+    <!-- Example 1: Simple Icon -->
+    <div class="panel">
+      <h3>Example 1: Heart Icon</h3>
+      <div class="svg-source">
+        <svg id="heart-svg" viewBox="0 0 100 100">
+          <path fill="#FF4444" d="M50 88 C20 60 5 40 5 25 C5 10 20 0 35 0 C45 0 50 8 50 8 C50 8 55 0 65 0 C80 0 95 10 95 25 C95 40 80 60 50 88 Z"/>
+        </svg>
+      </div>
+      <div class="arrow">↓ Convert & Animate ↓</div>
+      <div id="heart-anim" class="animation"></div>
+      <div class="code" id="heart-code"></div>
+    </div>
+
+    <!-- Example 2: Star Badge -->
+    <div class="panel">
+      <h3>Example 2: Star Badge</h3>
+      <div class="svg-source">
+        <svg id="star-svg" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" fill="#FFD700"/>
+          <path fill="#FF8800" d="M50 20 L58 40 L80 42 L64 56 L68 78 L50 68 L32 78 L36 56 L20 42 L42 40 Z"/>
+        </svg>
+      </div>
+      <div class="arrow">↓ Convert & Animate ↓</div>
+      <div id="star-anim" class="animation"></div>
+      <div class="code" id="star-code"></div>
+    </div>
+
+    <!-- Example 3: Custom Path -->
+    <div class="panel">
+      <h3>Example 3: Lightning Bolt</h3>
+      <div class="svg-source">
+        <svg id="bolt-svg" viewBox="0 0 100 100">
+          <path fill="#00BFFF" stroke="#0088FF" stroke-width="3" d="M55 5 L25 45 L45 45 L35 95 L75 45 L55 45 Z"/>
+        </svg>
+      </div>
+      <div class="arrow">↓ Convert & Animate ↓</div>
+      <div id="bolt-anim" class="animation"></div>
+      <div class="code" id="bolt-code"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Simulated API functions (in real usage, import from the package)
+
+    // Parse SVG path data to Lottie shape
+    function parseSVGPath(d) {
+      const vertices = [];
+      const inTangents = [];
+      const outTangents = [];
+
+      const normalized = d
+        .replace(/([A-Za-z])/g, ' $1 ')
+        .replace(/,/g, ' ')
+        .replace(/-/g, ' -')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const tokens = normalized.split(' ').filter(t => t.length > 0);
+
+      let currentX = 0, currentY = 0;
+      let startX = 0, startY = 0;
+      let lastCommand = '';
+      let lastControlX = 0, lastControlY = 0;
+      let i = 0;
+
+      const getNum = () => {
+        const num = parseFloat(tokens[i++]);
+        return isNaN(num) ? 0 : num;
+      };
+
+      while (i < tokens.length) {
+        let command = tokens[i];
+        if (/^[A-Za-z]$/.test(command)) {
+          i++;
+        } else {
+          command = lastCommand;
+        }
+
+        const isRelative = command === command.toLowerCase();
+        const cmd = command.toUpperCase();
+
+        switch (cmd) {
+          case 'M': {
+            const x = getNum() + (isRelative ? currentX : 0);
+            const y = getNum() + (isRelative ? currentY : 0);
+            currentX = startX = x;
+            currentY = startY = y;
+            vertices.push([x, y]);
+            inTangents.push([0, 0]);
+            outTangents.push([0, 0]);
+            lastCommand = isRelative ? 'l' : 'L';
+            break;
+          }
+          case 'L': {
+            const x = getNum() + (isRelative ? currentX : 0);
+            const y = getNum() + (isRelative ? currentY : 0);
+            currentX = x;
+            currentY = y;
+            vertices.push([x, y]);
+            inTangents.push([0, 0]);
+            outTangents.push([0, 0]);
+            lastCommand = command;
+            break;
+          }
+          case 'C': {
+            const cp1x = getNum() + (isRelative ? currentX : 0);
+            const cp1y = getNum() + (isRelative ? currentY : 0);
+            const cp2x = getNum() + (isRelative ? currentX : 0);
+            const cp2y = getNum() + (isRelative ? currentY : 0);
+            const x = getNum() + (isRelative ? currentX : 0);
+            const y = getNum() + (isRelative ? currentY : 0);
+            if (outTangents.length > 0) {
+              outTangents[outTangents.length - 1] = [cp1x - currentX, cp1y - currentY];
+            }
+            currentX = x;
+            currentY = y;
+            vertices.push([x, y]);
+            inTangents.push([cp2x - x, cp2y - y]);
+            outTangents.push([0, 0]);
+            lastCommand = command;
+            break;
+          }
+          case 'Z': {
+            lastCommand = command;
+            break;
+          }
+          default:
+            i++;
+            break;
+        }
+      }
+
+      return { c: lastCommand.toUpperCase() === 'Z', v: vertices, i: inTangents, o: outTangents };
+    }
+
+    function parseCircle(cx, cy, r) {
+      const k = 0.5522847498 * r;
+      return {
+        c: true,
+        v: [[cx, cy - r], [cx + r, cy], [cx, cy + r], [cx - r, cy]],
+        i: [[-k, 0], [0, -k], [k, 0], [0, k]],
+        o: [[k, 0], [0, k], [-k, 0], [0, -k]]
+      };
+    }
+
+    function hexToRgba(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? [
+        parseInt(result[1], 16) / 255,
+        parseInt(result[2], 16) / 255,
+        parseInt(result[3], 16) / 255,
+        1
+      ] : [0, 0, 0, 1];
+    }
+
+    function createAnimation(options) {
+      const fps = options.fps || 60;
+      const duration = options.duration || 2;
+      return {
+        v: "5.12.1",
+        fr: fps,
+        ip: 0,
+        op: fps * duration,
+        w: options.width || 100,
+        h: options.height || 100,
+        nm: "Animation",
+        ddd: 0,
+        assets: [],
+        layers: [],
+        markers: []
+      };
+    }
+
+    function addShapeLayer(anim, name, shapes, transform = {}) {
+      const layer = {
+        ty: 4,
+        ind: anim.layers.length,
+        nm: name,
+        ks: {
+          a: { a: 0, k: [0, 0, 0] },
+          p: transform.p || { a: 0, k: [50, 50, 0] },
+          s: transform.s || { a: 0, k: [100, 100, 100] },
+          r: transform.r || { a: 0, k: 0 },
+          o: transform.o || { a: 0, k: 100 }
+        },
+        ip: 0,
+        op: anim.op,
+        st: 0,
+        ddd: 0,
+        shapes: shapes
+      };
+      anim.layers.push(layer);
+      return layer;
+    }
+
+    function createShapeGroup(path, fill, stroke, strokeWidth) {
+      const items = [];
+
+      items.push({
+        ty: 'sh',
+        nm: 'Path',
+        ks: { a: 0, k: path }
+      });
+
+      if (fill) {
+        items.push({
+          ty: 'fl',
+          nm: 'Fill',
+          o: { a: 0, k: 100 },
+          c: { a: 0, k: hexToRgba(fill) },
+          r: 1
+        });
+      }
+
+      if (stroke) {
+        items.push({
+          ty: 'st',
+          nm: 'Stroke',
+          o: { a: 0, k: 100 },
+          c: { a: 0, k: hexToRgba(stroke) },
+          w: { a: 0, k: strokeWidth || 2 },
+          lc: 2,
+          lj: 2
+        });
+      }
+
+      items.push({
+        ty: 'tr',
+        p: { a: 0, k: [0, 0] },
+        a: { a: 0, k: [0, 0] },
+        s: { a: 0, k: [100, 100] },
+        r: { a: 0, k: 0 },
+        o: { a: 0, k: 100 }
+      });
+
+      return {
+        ty: 'gr',
+        nm: 'Shape',
+        it: items,
+        np: items.length - 1
+      };
+    }
+
+    // Demo 1: Heart with pulse animation
+    // Heart centered at origin for proper scaling
+    const heartPathCentered = parseSVGPath("M0 38 C-30 10 -45 -10 -45 -25 C-45 -40 -30 -50 -15 -50 C-5 -50 0 -42 0 -42 C0 -42 5 -50 15 -50 C30 -50 45 -40 45 -25 C45 -10 30 10 0 38 Z");
+
+    const heartAnim = createAnimation({ width: 250, height: 250, fps: 60, duration: 1 });
+    const heartShapes = [createShapeGroup(heartPathCentered, '#FF4444')];
+    addShapeLayer(heartAnim, 'Heart', heartShapes, {
+      p: { a: 0, k: [125, 125, 0] },
+      s: { a: 1, k: [
+        { t: 0, s: [220, 220, 100], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+        { t: 30, s: [250, 250, 100], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+        { t: 60, s: [220, 220, 100] }
+      ]}
+    });
+
+    lottie.loadAnimation({
+      container: document.getElementById('heart-anim'),
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      animationData: heartAnim
+    });
+
+    document.getElementById('heart-code').textContent =
+`// 1. Parse SVG path
+const path = SVGImporter.parseSVGPath(svgPathData);
+
+// 2. Create animation with pulse
+createAnimation({ width: 100, height: 100 })
+  .addShapeLayer('Heart', layer => {
+    layer.addPath({ path })
+         .addFill({ color: '#FF4444' })
+         .animateScale([
+           { time: 0, value: [100, 100] },
+           { time: 30, value: [115, 115] },
+           { time: 60, value: [100, 100] }
+         ]);
+  })
+  .build();`;
+
+    // Demo 2: Star badge with spin
+    // Center the shapes at origin (0,0) for proper rotation
+    const starPathCentered = parseSVGPath("M0 -30 L8 -10 L30 -8 L14 6 L18 28 L0 18 L-18 28 L-14 6 L-30 -8 L-8 -10 Z");
+    const circlePathCentered = parseCircle(0, 0, 45);
+
+    const starAnim = createAnimation({ width: 250, height: 250, fps: 60, duration: 2 });
+    // In Lottie, layer index 0 is on TOP - so add star first (will be index 0, on top)
+    // Add star layer FIRST (foreground - index 0)
+    addShapeLayer(starAnim, 'Star', [
+      createShapeGroup(starPathCentered, '#FF8800')
+    ], {
+      p: { a: 0, k: [125, 125, 0] },
+      s: { a: 0, k: [240, 240, 100] },
+      r: { a: 1, k: [
+        { t: 0, s: [0], i: { x: 1, y: 1 }, o: { x: 0, y: 0 } },
+        { t: 120, s: [360] }
+      ]}
+    });
+    // Add circle layer SECOND (background - index 1)
+    addShapeLayer(starAnim, 'Circle', [
+      createShapeGroup(circlePathCentered, '#FFD700')
+    ], {
+      p: { a: 0, k: [125, 125, 0] },
+      s: { a: 0, k: [240, 240, 100] },
+      r: { a: 1, k: [
+        { t: 0, s: [0], i: { x: 1, y: 1 }, o: { x: 0, y: 0 } },
+        { t: 120, s: [360] }
+      ]}
+    });
+
+    lottie.loadAnimation({
+      container: document.getElementById('star-anim'),
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      animationData: starAnim
+    });
+
+    document.getElementById('star-code').textContent =
+`// 1. Parse multiple SVG shapes
+const star = SVGImporter.parseSVGPath(starData);
+const circle = SVGImporter.parseCircle(50, 50, 45);
+
+// 2. Create spinning badge
+createAnimation({ width: 100, height: 100 })
+  .addShapeLayer('Badge', layer => {
+    layer.addPath({ path: circle })
+         .addFill({ color: '#FFD700' });
+    layer.addPath({ path: star })
+         .addFill({ color: '#FF8800' });
+    layer.animateRotation([
+      { time: 0, value: 0 },
+      { time: 120, value: 360 }
+    ]);
+  })
+  .build();`;
+
+    // Demo 3: Lightning bolt with flash
+    // Bolt centered at origin
+    const boltPathCentered = parseSVGPath("M5 -45 L-25 -5 L-5 -5 L-15 45 L25 -5 L5 -5 Z");
+
+    const boltAnim = createAnimation({ width: 250, height: 250, fps: 60, duration: 1 });
+    addShapeLayer(boltAnim, 'Bolt', [
+      createShapeGroup(boltPathCentered, '#00BFFF', '#0088FF', 3)
+    ], {
+      p: { a: 0, k: [125, 125, 0] },
+      o: { a: 1, k: [
+        { t: 0, s: [0], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+        { t: 10, s: [100], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+        { t: 15, s: [30], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+        { t: 20, s: [100], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+        { t: 60, s: [100] }
+      ]},
+      s: { a: 1, k: [
+        { t: 0, s: [200, 200, 100], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+        { t: 10, s: [260, 260, 100], i: { x: 0.42, y: 0 }, o: { x: 0.58, y: 1 } },
+        { t: 30, s: [240, 240, 100] }
+      ]}
+    });
+
+    lottie.loadAnimation({
+      container: document.getElementById('bolt-anim'),
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      animationData: boltAnim
+    });
+
+    document.getElementById('bolt-code').textContent =
+`// 1. Parse SVG with stroke
+const bolt = SVGImporter.parseSVGPath(boltData);
+
+// 2. Create flash animation
+createAnimation({ width: 100, height: 100 })
+  .addShapeLayer('Bolt', layer => {
+    layer.addPath({ path: bolt })
+         .addFill({ color: '#00BFFF' })
+         .addStroke({ color: '#0088FF', width: 3 })
+         .animateOpacity([
+           { time: 0, value: 0 },
+           { time: 10, value: 100 },
+           { time: 15, value: 30 },
+           { time: 20, value: 100 }
+         ])
+         .animateScale([
+           { time: 0, value: [80, 80] },
+           { time: 10, value: [110, 110] },
+           { time: 30, value: [100, 100] }
+         ]);
+  })
+  .build();`;
+  </script>
+</body>
+</html>

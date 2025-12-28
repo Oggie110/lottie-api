@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Lottie Creator API - Preview</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  <style>
+    body { font-family: system-ui; background: #1a1a2e; color: white; margin: 0; padding: 40px; }
+    h1 { text-align: center; margin-bottom: 40px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; max-width: 900px; margin: 0 auto; }
+    .card { background: #2a2a4a; border-radius: 16px; padding: 20px; text-align: center; }
+    .card h3 { margin: 0 0 15px 0; font-size: 14px; opacity: 0.8; }
+    .animation { width: 150px; height: 150px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <h1>Lottie Creator API - Preview</h1>
+  <div class="grid">
+    <div class="card"><h3>quickLoader()</h3><div id="loader" class="animation"></div></div>
+    <div class="card"><h3>quickShape('circle', 'pulse')</h3><div id="circle" class="animation"></div></div>
+    <div class="card"><h3>quickShape('star', 'spin')</h3><div id="star" class="animation"></div></div>
+    <div class="card"><h3>quickCheckmark()</h3><div id="check" class="animation"></div></div>
+  </div>
+  <script>
+    const animations = {
+      loader: {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":180,"h":180,"nm":"Animation","ddd":0,"assets":[],"layers":[{"ty":4,"ind":0,"nm":"Spinner","ks":{"a":{"a":0,"k":[0,0,0]},"p":{"a":0,"k":[90,90,0]},"s":{"a":0,"k":[100,100,100]},"r":{"a":1,"k":[{"t":0,"s":[0],"i":{"x":1,"y":1},"o":{"x":0,"y":0}},{"t":90,"s":[360]}]},"o":{"a":0,"k":100}},"ip":0,"op":90,"st":0,"ddd":0,"shapes":[{"ty":"gr","nm":"Group","it":[{"ty":"el","nm":"Circle","p":{"a":0,"k":[0,0]},"s":{"a":0,"k":[112,112]}},{"ty":"tm","nm":"Trim Paths","s":{"a":1,"k":[{"t":0,"s":[0],"i":{"x":0.42,"y":0},"o":{"x":0.58,"y":1}},{"t":45,"s":[25],"i":{"x":0.42,"y":0},"o":{"x":0.58,"y":1}},{"t":90,"s":[0]}]},"e":{"a":1,"k":[{"t":0,"s":[25],"i":{"x":0.42,"y":0},"o":{"x":0.58,"y":1}},{"t":45,"s":[100],"i":{"x":0.42,"y":0},"o":{"x":0.58,"y":1}},{"t":90,"s":[25]}]},"o":{"a":0,"k":0},"m":1},{"ty":"st","nm":"Stroke","o":{"a":0,"k":100},"c":{"a":0,"k":[0.25882352941176473,0.5215686274509804,0.9568627450980393,1]},"w":{"a":0,"k":8},"lc":2,"lj":2},{"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100}}],"np":3}]}],"markers":[]},
+      circle: {"v":"5.12.1","fr":60,"ip":0,"op":120,"w":300,"h":300,"nm":"Animation","ddd":0,"assets":[],"layers":[{"ty":4,"ind":0,"nm":"Shape","ks":{"a":{"a":0,"k":[0,0,0]},"p":{"a":0,"k":[150,150,0]},"s":{"a":1,"k":[{"t":0,"s":[100,100,100],"i":{"x":0.42,"y":0},"o":{"x":0.58,"y":1}},{"t":60,"s":[120,120,100],"i":{"x":0.42,"y":0},"o":{"x":0.58,"y":1}},{"t":120,"s":[100,100,100]}]},"r":{"a":0,"k":0},"o":{"a":0,"k":100}},"ip":0,"op":120,"st":0,"ddd":0,"shapes":[{"ty":"gr","nm":"Group","it":[{"ty":"el","nm":"Circle","p":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]}},{"ty":"fl","nm":"Fill","o":{"a":0,"k":100},"c":{"a":0,"k":[1,0.4196078431372549,0.4196078431372549,1]},"r":1},{"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100}}],"np":2}]}],"markers":[]},
+      star: {"v":"5.12.1","fr":60,"ip":0,"op":120,"w":300,"h":300,"nm":"Animation","ddd":0,"assets":[],"layers":[{"ty":4,"ind":0,"nm":"Shape","ks":{"a":{"a":0,"k":[0,0,0]},"p":{"a":0,"k":[150,150,0]},"s":{"a":0,"k":[100,100,100]},"r":{"a":1,"k":[{"t":0,"s":[0],"i":{"x":1,"y":1},"o":{"x":0,"y":0}},{"t":120,"s":[360]}]},"o":{"a":0,"k":100}},"ip":0,"op":120,"st":0,"ddd":0,"shapes":[{"ty":"gr","nm":"Group","it":[{"ty":"sh","nm":"Star","ks":{"a":0,"k":{"c":true,"v":[[3.061616997868383e-15,-50],[14.694631307311829,-20.225424859373685],[47.552825814757675,-15.450849718747369],[23.776412907378838,7.7254248593736845],[29.389262614623657,40.45084971874737],[1.5308084989341915e-15,25],[-29.38926261462365,40.45084971874737],[-23.776412907378838,7.725424859373688],[-47.55282581475768,-15.450849718747364],[-14.69463130731183,-20.225424859373682]],"i":[[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]}}},{"ty":"fl","nm":"Fill","o":{"a":0,"k":100},"c":{"a":0,"k":[1,0.8431372549019608,0,1]},"r":1},{"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100}}],"np":2}]}],"markers":[]},
+      check: {"v":"5.12.1","fr":60,"ip":0,"op":30,"w":150,"h":150,"nm":"Animation","ddd":0,"assets":[],"layers":[{"ty":4,"ind":0,"nm":"Checkmark","ks":{"a":{"a":0,"k":[0,0,0]},"p":{"a":0,"k":[75,75,0]},"s":{"a":0,"k":[100,100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100}},"ip":0,"op":30,"st":0,"ddd":0,"shapes":[{"ty":"gr","nm":"Group","it":[{"ty":"sh","nm":"Check","ks":{"a":0,"k":{"c":false,"v":[[-33.333333333333336,0],[-12.5,25],[33.333333333333336,-25]],"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]]}}},{"ty":"tm","nm":"Trim Paths","s":{"a":0,"k":0},"e":{"a":1,"k":[{"t":0,"s":[0],"i":{"x":0,"y":0},"o":{"x":0.58,"y":1}},{"t":30,"s":[100]}]},"o":{"a":0,"k":0},"m":1},{"ty":"st","nm":"Stroke","o":{"a":0,"k":100},"c":{"a":0,"k":[0.20392156862745098,0.6588235294117647,0.3254901960784314,1]},"w":{"a":0,"k":8},"lc":2,"lj":2},{"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100}}],"np":3}]}],"markers":[]}
+    };
+    Object.entries(animations).forEach(([id, data]) => {
+      lottie.loadAnimation({ container: document.getElementById(id), renderer: 'svg', loop: true, autoplay: true, animationData: data });
+    });
+  </script>
+</body>
+</html>
